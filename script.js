@@ -113,25 +113,25 @@ function tick() {
 }
 
 // Color nodes
-function color(d) {
-    if (d.type) {
-        return colors[d.type].color;
+function color(node) {
+    if (node.type == 'Job') {
+        return colors[node.name]['color'];
     }
     return 'white';
 }
 
 // Toggle children on click.
-function click(d) {
-    if (d.children) {
-        d._children = d.children;
-        d.children = null;
+function click(node) {
+    if (node.children) {
+        node.children = node._children;
+        node._children = null;
     } else {
-        d.children = d._children;
-        d._children = null;
+        node._children = node.children;
+        node.children = null;
     }
     update();
 
-    $('#info').html(d.name);
+    $('#info').html(node.name);
     var currentColor = "white";
     currentColor = currentColor == "white" ? "lightGrey" : "white";
     d3.select(this).style("fill", currentColor);
@@ -148,7 +148,7 @@ function flatten(root) {
 
         var show = 1;
         if (node.type) {
-            show = colors[node.type-1].show;
+            show = colors[node.name]['show'];
         }
         if (show) {
             nodes.push(node);
