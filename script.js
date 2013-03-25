@@ -11,6 +11,7 @@ colors['GroupView'] = {color: 'Grey', show: 1};
 colors['OrganismView'] = {color: 'Black', show: 1};
 colors['SeqType'] = {color: 'Yellow', show: 1};
 colors['Groups'] = {color: 'Turquoise', show: 1};
+colors['root'] = {color: 'white', show: 1};
 
 var w = Math.max(800, $(window).width()-200),
     h = Math.max(800, $(window).height()),
@@ -122,19 +123,29 @@ function color(node) {
 
 // Toggle children on click.
 function click(node) {
-    if (node.children) {
-        node.children = node._children;
-        node._children = null;
-    } else {
-        node._children = node.children;
-        node.children = null;
+    if (node.type == 'User'){
+        if (_.isEmpty(node.children) && (!node._children)) {
+            console.log("load");
+            d3.json("source.py?user=" + node.id, function(json) {
+                node.children = json;
+            });
+            node._children = null;
+        } else if (!_.isNull(node.children)) {
+            console.log("hide");
+            node._children = node.children;
+            node.children = null;
+        } else {
+            console.log("show");
+            node.children = node._children;
+            node._children = null;
+        }
+        console.log(node);
     }
-    update();
-
     $('#info').html(node.name);
     var currentColor = "white";
     currentColor = currentColor == "white" ? "lightGrey" : "white";
     d3.select(this).style("fill", currentColor);
+    _.delay(function(){ update(); }, 700);
 }
 
 
@@ -143,16 +154,9 @@ function flatten(root) {
     var nodes = [], i = 0;
 
     function recurse(node) {
-        if (node.children) node.children.forEach(recurse);
+        if (!_.isEmpty(node.children)) node.children.forEach(recurse);
         if (!node.id) node.id = ++i;
-
-        var show = 1;
-        if (node.type) {
-            show = colors[node.name]['show'];
-        }
-        if (show) {
-            nodes.push(node);
-        }
+        nodes.push(node);
     }
 
     recurse(root);

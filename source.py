@@ -1,66 +1,148 @@
 import MySQLdb as mdb
 import json
+from cgi import parse_qs, escape
 
 def application(environ, start_response):
 
-    con = None
+    # Get the passed params of the AJAX request
+    d = parse_qs(environ['QUERY_STRING'])
 
-    try:
-        con = mdb.connect('localhost', 'coge', '123coge321', 'coge');
+    user = d.get('user', [''])[0]
+    job = d.get('job', [''])[0]
 
-        cur = con.cursor()
-        cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id LIMIT 500;")
+    # Connection info
+    con = mdb.connect('localhost', 'coge', '123coge321', 'coge');
+    cur = con.cursor()
 
-        users = {}
+    response_body = ''
+    status = '200 OK'
 
-        for row in cur :
+    if user == '' and job == '':
+        try:
+            cur.execute("SELECT * FROM user;")
 
-            name = row[2]
-            type = row[12]
+            users = {}
 
-            if name not in users:
-                users[name] = { "name" : name,
-                                "type" : "User",
-                                "children" : {},
-                              }
+            for row in cur :
 
-            if type not in users[name]["children"]:
-                users[name]["children"][type] = { "name" : type,
-                                                  "type" : "Job",
-                                                  "children" : [],
-                                                }
+                user_id = row[0]
+                user_name = row[1]
 
-            job = { "link" : row[14],
-                    "log_id" : row[9],
-                  }
+                if user_id not in users:
+                    users[user_id] = {"name" : user_name,
+                                      "id" : user_id}
 
-            users[name]["children"][type]["children"].append(job)
+            def format(user_tuple):
+                user = user_tuple[1]
+                return {"name" : user["name"],
+                        "id" : user["id"],
+                        "type" : "User",
+                        "children" : []}
 
-        def format(user_tuple):
-            user = user_tuple[1]
+            users_formatted = map(format, users.iteritems())
 
-            def format_types(types_tuple):
-                return types_tuple[1]
+            response_body = { "name" : "root",
+                              "children" : users_formatted,
+                            }
 
-            return {"name" : user["name"],
-                    "children" : map(format_types, user["children"].iteritems())}
+            status = '200 OK'
+            response_body = json.dumps(response_body)
 
-        users_formatted = map(format, users.iteritems())
+        except mdb.Error, e:
+            response_body = "Error %d: %s" % (e.args[0], e.args[1])
+            status = '500 Internal Server Error'
 
-        response_body = { "name" : "root",
-                          "children" : users_formatted,
-                        }
+        finally:
+            if con:
+                con.close()
 
-        status = '200 OK'
-        response_body = json.dumps(response_body)
+    elif user and job:
+        try:
+            cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id where user.user_id = %s AND log.page = %s;" % (user,job))
 
-    except mdb.Error, e:
-        response_body = "Error %d: %s" % (e.args[0], e.args[1])
-        status = '500 Internal Server Error'
+            users = {}
 
-    finally:
-        if con:
-            con.close()
+            for row in cur :
+
+                user_id = row[0]
+                user_name = row[1]
+                type = row[12]
+
+                if user_id not in users:
+                    users[user_id] = { "id" : user_id,
+                                       "name" : user_name,
+                                       "children" : {},
+                                     }
+
+                if type not in users[user_id]["children"]:
+                    users[user_id]["children"][type] = { "name" : type,
+                                                         "type" : "Job",
+                                                         "children" : [],
+                                                        }
+
+                job = { "link" : row[14],
+                        "log_id" : row[9],
+                    }
+
+                users[user_id]["children"][type]["children"].append(job)
+
+            def format(user_tuple):
+                user = user_tuple[1]
+
+                def format_types(types_tuple):
+                    return types_tuple[1]
+
+                return {"name" : user["name"],
+                        "id" : user["id"],
+                        "type" : "User",
+                        "children" : map(format_types, user["children"].iteritems())}
+
+            status = '200 OK'
+            response_body = json.dumps(map(format, users.iteritems()))
+
+        except mdb.Error, e:
+            response_body = "Error %d: %s" % (e.args[0], e.args[1])
+            status = '500 Internal Server Error'
+
+        finally:
+            if con:
+                con.close()
+
+
+    # When passed a only a user arg, return a tree of jobs that user has run.
+    else:
+        try:
+            cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id where user.user_id = %s" % user)
+
+            types = {}
+
+            for row in cur :
+
+                type = row[12]
+
+                if type not in types:
+                    types[type] = { "name" : type }
+
+            def format(types_tuple):
+                type = types_tuple[1]
+
+                return { "name" : type["name"],
+                         "type" : "Type",
+                         "children" : [],
+                       }
+
+            types_formatted = map(format, types.iteritems())
+
+            status = '200 OK'
+            response_body = json.dumps(types_formatted)
+
+        except mdb.Error, e:
+            response_body = "Error %d: %s" % (e.args[0], e.args[1])
+            status = '500 Internal Server Error'
+
+        finally:
+            if con:
+                con.close()
 
     response_headers = [('Content-Type', 'application/json')]
     start_response(status, response_headers)
