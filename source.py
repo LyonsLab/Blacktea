@@ -9,10 +9,7 @@ def application(environ, start_response):
         con = mdb.connect('localhost', 'coge', '123coge321', 'coge');
 
         cur = con.cursor()
-
-        #cur.execute("SELECT * FROM user")
-        cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id LIMIT 5000;")
-
+        cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id LIMIT 500;")
 
         users = {}
 
@@ -23,11 +20,13 @@ def application(environ, start_response):
 
             if name not in users:
                 users[name] = { "name" : name,
+                                "type" : "User",
                                 "children" : {},
                               }
 
             if type not in users[name]["children"]:
                 users[name]["children"][type] = { "name" : type,
+                                                  "type" : "Job",
                                                   "children" : [],
                                                 }
 

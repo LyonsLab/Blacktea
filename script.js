@@ -1,11 +1,16 @@
-var colors = [
-  { name: 'GEvo',       link: 'NotebookView.pl?nid=',   color: 'Tomato'     },
-  { name: 'CoGeBlast',  link: 'GenomeInfo.pl?gid=',     color: 'YellowGreen'},
-  { name: 'SynMap',     link: 'ExperimentView.pl?eid=', color: 'Orchid'     },
-  { name: 'SynFind',    link: '',                       color: 'Orange'     },
-  { name: 'user',       link: '',                       color: 'DeepSkyBlue'},
-  { name: 'group',      link: 'GroupView.pl?ugid=',     color: 'Turquoise'  },
-];
+var colors = new Array();
+colors['GEvo'] = {color: 'Tomato', show: 1};
+colors['NotebookView'] = {color: 'Aqua', show: 1};
+colors['CoGeBlast'] = {color: 'YellowGreen', show: 1};
+colors['SynMap'] = {color: 'Orchid', show: 1};
+colors['SynFind'] = {color: 'Orange', show: 1};
+colors['Users'] = {color: 'DeepSkyBlue', show: 1};
+colors['Sources'] = {color: 'Olive', show: 1};
+colors['GenomeList'] = {color: 'Magenta', show: 1};
+colors['GroupView'] = {color: 'Grey', show: 1};
+colors['OrganismView'] = {color: 'Black', show: 1};
+colors['SeqType'] = {color: 'Yellow', show: 1};
+colors['Groups'] = {color: 'Turquoise', show: 1};
 
 var w = Math.max(800, $(window).width()-200),
     h = Math.max(800, $(window).height()),
