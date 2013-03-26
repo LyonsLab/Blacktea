@@ -45,7 +45,6 @@ def application(environ, start_response):
                               "children" : users_formatted,
                             }
 
-            status = '200 OK'
             response_body = json.dumps(response_body)
 
         except mdb.Error, e:
@@ -58,24 +57,19 @@ def application(environ, start_response):
 
     elif user and job:
         try:
-            cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id where user.user_id = %s AND log.page = %s;" % (user,job))
+            cur.execute("SELECT * FROM log where log.user_id = %s AND log.page like %s GROUP BY link;" % (user, job));
 
             jobs = []
 
             for row in cur :
 
-                user_id = row[0]
-                user_name = row[1]
-                type = row[12]
-
-
-                job = { "link" : row[14],
-                        "log_id" : row[9],
+                job = { "link" : row[5],
+                        "date" : str(row[1]),
+                        "log_id" : row[0],
                       }
 
                 jobs.append(job)
 
-            status = '200 OK'
             response_body = json.dumps(jobs)
 
         except mdb.Error, e:
@@ -111,7 +105,6 @@ def application(environ, start_response):
 
             types_formatted = map(format, types.iteritems())
 
-            status = '200 OK'
             response_body = json.dumps(types_formatted)
 
         except mdb.Error, e:
