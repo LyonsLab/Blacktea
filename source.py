@@ -19,7 +19,7 @@ def application(environ, start_response):
 
     if user == '' and job == '':
         try:
-            cur.execute("SELECT * FROM user;")
+            cur.execute("SELECT *, (SELECT count(page) FROM log where user_id = user.user_id) AS count from user;")
 
             users = {}
 
@@ -27,15 +27,25 @@ def application(environ, start_response):
 
                 user_id = row[0]
                 user_name = row[1]
+                user_email = row[4]
+                user_date = row[7]
+                user_size = row[9]
 
                 if user_id not in users:
                     users[user_id] = {"name" : user_name,
-                                      "user_id" : user_id}
+                                      "user_id" : user_id,
+                                      "email" : user_email,
+                                      "size" : user_size,
+                                      "date" : str(user_date),
+                                     }
 
             def format(user_tuple):
                 user = user_tuple[1]
                 return {"name" : user["name"],
                         "user_id" : user["user_id"],
+                        "email" : user["email"],
+                        "size" : user["size"],
+                        "date" : user["date"],
                         "type" : "User",
                         "children" : []}
 
@@ -65,6 +75,7 @@ def application(environ, start_response):
 
                 job = { "link" : row[5],
                         "date" : str(row[1]),
+                        "type" : "Job",
                         "log_id" : row[0],
                       }
 
@@ -84,28 +95,33 @@ def application(environ, start_response):
     # When passed a only a user arg, return a tree of jobs that user has run.
     else:
         try:
-            cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id where user.user_id = %s" % user)
+            cur.execute("SELECT page, count(distinct link) AS count FROM log where user_id = %s group by page;" % user)
 
             types = {}
 
             for row in cur :
 
-                if row[12] is not None:
-                    type = row[12]
+                if row[0] is not None:
+                    type = row[0]
+                    size = row[1]
                 else:
                     response_body = {}
                     break
 
-                #print >> environ['wsgi.errors'], row[12]
+                # print >> environ['wsgi.errors'], row[0]
 
                 if type not in types:
-                    types[type] = { "name" : type }
+                    types[type] = { "name" : type,
+                                    "size" : size,
+                                  }
 
             def format(types_tuple):
                 type = types_tuple[1]
 
                 return { "name" : type["name"],
                          "type" : "Type",
+                         "size" : type["size"],
+                         "user_id" : user,
                          "children" : [],
                        }
 

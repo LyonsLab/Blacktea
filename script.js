@@ -1,13 +1,20 @@
-var w = Math.max(800, $(window).width()-200),
+var w = Math.max(800, $(window).width()),
     h = Math.max(800, $(window).height()),
     node, link, root;
-    color = d3.scale.category20();
+    color = d3.scale.category20c();
 
 $(function() {
     // Setup D3
     force = d3.layout.force()
         .on("tick", tick)
-        .size([w, h]);
+        .size([w, h])
+        .charge(-120)
+        .alpha(-.01)
+        .theta(1)
+        .linkDistance(40)
+        .linkStrength(1)
+        .friction(.7)
+        .gravity(.2);
 
     vis = d3.select("#chart").append("svg:svg")
         .attr("width", w)
@@ -15,7 +22,6 @@ $(function() {
 
     d3.json("source.py", function(json) {
         root = json;
-        //console.log(root);
         update();
     });
 });
@@ -55,9 +61,9 @@ function update() {
         .append("div")
         .style("position", "absolute")
         .style("background", "#666")
-        .style("border-radius", "5")
+        .style("border-radius", "4")
         .style("padding", "3")
-        .style("color", "#BBB")
+        .style("color", "#EEE")
         .style("font-family", "tahoma")
         .style("z-index", "10")
         .style("visibility", "hidden");
@@ -67,15 +73,39 @@ function update() {
         .attr("class", "node")
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
-        .attr("r", function(d) { return Math.sqrt(d.size) / 3 || 4.5; })
+        .attr("r", function(d) {
+            if (d.name == "root") size = 10;
+            else if (d.type == "Job") size = 5;
+            else size = Math.sqrt(d.size) / 2 || 3;
+            if (size < 3) size = 4;
+            return size;
+        })
         .style("fill", fill)
         .on("click", click)
         .on("mouseover", function(d) {
-            c = (d.type != "User") ? color(d.name) : 'white';
-            return tooltip.style("visibility", "visible").text(d.name).style("color", c);
+            if (d.name == "root") {
+                return tooltip.style("visibility", "visible")
+                        .text("Users");
+            } else if (d.type != 'Job') {
+                return tooltip.style("visibility", "visible")
+                        .text(d.name + " : " + d.size);
+            } else {
+                return tooltip.style("visibility", "visible")
+                        .text("date: "  + d.date + "\n\nLink: " + d.link + "\n\nlog id: " + d.log_id);
+            }
         })
-        .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
-                .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+        .on("mousemove", function(){
+            return tooltip
+                .style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+        })
+        .on("mouseout", function(){
+            return tooltip
+                .style("visibility", "hidden");
+        })
+        .on("mousedown", function(d){
+            if (d.type != 'Job' && d.size > 0)
+                d.fixed = true;
+        })
         .call(force.drag)
         .append("svg:title").text(function(d) { return d.info; });
 
@@ -95,35 +125,51 @@ function tick() {
 
 // Color nodes
 function fill(node) {
-    if (node.type == 'Type') {
-        return color(node.name);
-    } else if (node.type == 'User') {
+    if (node.name == "root")
+        return 'black';
+    if (node.type == "Job")
+        if (node.link == null)
+            return 'Red';
+        else
+            return 'Green';
+    if (node.size > 0){
+        if (node.type == 'Type') {
+            return color(node.name);
+        } else if (node.type == 'User') {
+            return 'white';
+        }
         return 'white';
+    } else {
+        return 'grey';
     }
-    return 'white';
 }
 
 // Toggle children on click.
 function click(node) {
-    if (node.type == 'User'){
+    if (node.type == "Job" && node.link != null){
+        window.open(node.link);
+    } else {
         if (_.isEmpty(node.children) && (!node._children)) {
-            //console.log("load");
-            d3.json("source.py?user=" + node.id, function(json) {
+            if(node.type == 'User'){
+                url = "source.py?user=" + node.user_id
+            } else if (node.type == 'Type') {
+                url = "source.py?user="+node.user_id+"&job='"+ node.name +"'"
+            }
+            d3.json(url, function(json) {
                 node.children = json;
+                update();
             });
             node._children = null;
         } else if (!_.isNull(node.children)) {
-            //console.log("hide");
             node._children = node.children;
             node.children = null;
+            node.fixed = false;
+            update();
         } else {
-            //console.log("show");
             node.children = node._children;
-            node._children = null;
+            update();
         }
     }
-    console.log(node);
-    _.delay(function(){ update(); }, 300);
 }
 
 
@@ -135,6 +181,7 @@ function flatten(root) {
     function recurse(node) {
         if (node.children) node.children.forEach(recurse);
         if (!node.id) node.id = ++i;
+        if (node.name == 'root') node.fixed = true; 
         nodes.push(node);
     }
 
