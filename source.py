@@ -90,7 +90,13 @@ def application(environ, start_response):
 
             for row in cur :
 
-                type = row[12]
+                if row[12] is not None:
+                    type = row[12]
+                else:
+                    response_body = {}
+                    break
+
+                #print >> environ['wsgi.errors'], row[12]
 
                 if type not in types:
                     types[type] = { "name" : type }
