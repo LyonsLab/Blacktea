@@ -115,8 +115,10 @@ function tick() {
 
 // Color nodes
 function color(node) {
-    if (node.type == 'Job') {
+    if (node.type == 'Type') {
         return colors[node.name]['color'];
+    } else if (node.type == 'User') {
+        return 'white';
     }
     return 'white';
 }
@@ -145,7 +147,7 @@ function click(node) {
     var currentColor = "white";
     currentColor = currentColor == "white" ? "lightGrey" : "white";
     d3.select(this).style("fill", currentColor);
-    _.delay(function(){ update(); }, 700);
+    _.delay(function(){ update(); }, 100);
 }
 
 
@@ -154,7 +156,7 @@ function flatten(root) {
     var nodes = [], i = 0;
 
     function recurse(node) {
-        if (!_.isEmpty(node.children)) node.children.forEach(recurse);
+        if (node.children) node.children.forEach(recurse);
         if (!node.id) node.id = ++i;
         nodes.push(node);
     }

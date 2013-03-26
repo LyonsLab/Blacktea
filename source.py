@@ -30,12 +30,12 @@ def application(environ, start_response):
 
                 if user_id not in users:
                     users[user_id] = {"name" : user_name,
-                                      "id" : user_id}
+                                      "user_id" : user_id}
 
             def format(user_tuple):
                 user = user_tuple[1]
                 return {"name" : user["name"],
-                        "id" : user["id"],
+                        "user_id" : user["user_id"],
                         "type" : "User",
                         "children" : []}
 
@@ -60,7 +60,7 @@ def application(environ, start_response):
         try:
             cur.execute("SELECT * FROM user LEFT JOIN log ON user.user_id = log.user_id where user.user_id = %s AND log.page = %s;" % (user,job))
 
-            users = {}
+            jobs = []
 
             for row in cur :
 
@@ -68,37 +68,15 @@ def application(environ, start_response):
                 user_name = row[1]
                 type = row[12]
 
-                if user_id not in users:
-                    users[user_id] = { "id" : user_id,
-                                       "name" : user_name,
-                                       "children" : {},
-                                     }
-
-                if type not in users[user_id]["children"]:
-                    users[user_id]["children"][type] = { "name" : type,
-                                                         "type" : "Job",
-                                                         "children" : [],
-                                                        }
 
                 job = { "link" : row[14],
                         "log_id" : row[9],
-                    }
+                      }
 
-                users[user_id]["children"][type]["children"].append(job)
-
-            def format(user_tuple):
-                user = user_tuple[1]
-
-                def format_types(types_tuple):
-                    return types_tuple[1]
-
-                return {"name" : user["name"],
-                        "id" : user["id"],
-                        "type" : "User",
-                        "children" : map(format_types, user["children"].iteritems())}
+                jobs.append(job)
 
             status = '200 OK'
-            response_body = json.dumps(map(format, users.iteritems()))
+            response_body = json.dumps(jobs)
 
         except mdb.Error, e:
             response_body = "Error %d: %s" % (e.args[0], e.args[1])
