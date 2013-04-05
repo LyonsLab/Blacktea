@@ -1,8 +1,18 @@
 from django.http import HttpResponse
-from forceDirected.models import User
+from django.shortcuts import render
 import json
+
+from forceDirected.models import User
+
 # Create your views here.
 def index(request):
-    users = User.objects.all()
-    response = ', '.join([" ".join([str(getattr(p, f.name)) for f in p._meta.fields]) for p in users])
-    return HttpResponse(response)
+    return render(request, 'forceDirected/index.html', "text/html")
+
+def source(request):
+    users = [user.__json__() for user in User.objects.all()]
+
+    response = { "name" : "root",
+                 "children" : users
+               }
+    response = json.dumps(response)
+    return HttpResponse(response, "text/json")
