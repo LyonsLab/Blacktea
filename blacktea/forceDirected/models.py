@@ -1,5 +1,4 @@
 from django.db import models
-import datetime
 
 class User(models.Model):
     user_id = models.AutoField(primary_key=True)
@@ -16,12 +15,10 @@ class User(models.Model):
         db_table = 'user'
 
     def __json__(self):
-        date = int(self.date.strftime('%s')) if self.date else None
-        json = {"user_name" : self.user_name,
+        json = {"name" : self.user_name,
                 "user_id" : self.user_id,
-                "email" : self.email,
-                "date" : date,
                 "type" : "User",
+                "size" : Log.objects.filter(user=self.user_id).count(),
                 "children" : []
                }
         return json
@@ -36,6 +33,6 @@ class Log(models.Model):
     status = models.BooleanField()
     comment = models.CharField(max_length=255)
 
-    # Connect to the user table of the database
+    # Connect to the log table of the database
     class Meta:
         db_table = 'log'

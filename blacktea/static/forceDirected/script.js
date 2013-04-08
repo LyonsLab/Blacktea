@@ -20,7 +20,7 @@ $(function() {
         .attr("width", w)
         .attr("height", h);
 
-    d3.json("source.py", function(json) {
+    d3.json("users", function(json) {
         root = json;
         update();
     });
@@ -151,9 +151,9 @@ function click(node) {
     } else {
         if (_.isEmpty(node.children) && (!node._children)) {
             if(node.type == 'User'){
-                url = "source.py?user=" + node.user_id
+                url = "user/" + node.user_id
             } else if (node.type == 'Type') {
-                url = "source.py?user="+node.user_id+"&job='"+ node.name +"'"
+                url = "user/" + node.user_id + "/type/"+ node.name
             }
             d3.json(url, function(json) {
                 node.children = json;
