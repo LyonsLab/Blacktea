@@ -146,8 +146,10 @@ function fill(node) {
 
 // Toggle children on click.
 function click(node) {
-    if (node.type == "Job" && node.link != null){
-        window.open(node.link);
+    if (node.type == "Job"){
+        if(node.link != null) {
+            window.open(node.link);
+        }
     } else {
         if (_.isEmpty(node.children) && (!node._children)) {
             if(node.type == 'User'){
