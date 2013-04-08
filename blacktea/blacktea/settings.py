@@ -121,7 +121,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     #'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'forceDirected',
+=======
+    'south',
+>>>>>>> e0ea3e0fa2cf40859d5f2d7d5078b50b509d9f87
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
