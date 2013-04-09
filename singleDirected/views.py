@@ -3,33 +3,32 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 import json
 
-from forceDirected.models import User, Log
+from singleDirected.models import User, Log
 
 # Create your views here.
 def index(request):
-    return render(request, 'forceDirected/index.html', "text/html")
+    return render(request, 'singleDirected/index.html', "text/html")
 
-def users(request):
-    users = [user.__json__() for user in User.objects.all()]
-
-    response = { "name" : "root",
-                 "children" : users
-               }
-
-    return HttpResponse(json.dumps(response), "text/json")
-
-def user_details(request, user_id):
+def user(request, user_id):
+    users = User.objects.get(user_id = user_id).__dict__
+    size = Log.objects.filter(user=user_id).count()
     details = Log.objects.filter(user=user_id).values('page', 'user').annotate(count=Count('link'))
 
-    response = []
+    children = []
     for detail in details:
-        response.append({ "name" : detail['page'],
+        children.append({ "name" : detail['page'],
                     "user_id" : detail['user'],
                     "type" : "Type",
                     "size" : detail['count'],
                     "children" : []
                     })
 
+    response = { "name" : users['user_name'],
+                 "user_id" : user_id,
+                 "type" : "User",
+                 "size" : size,
+                 "children" : children
+               }
 
     return HttpResponse(json.dumps(response), "text/json")
 
