@@ -1,7 +1,7 @@
 var w = Math.max(800, $(window).width()),
     h = Math.max(800, $(window).height()),
     node, link, root;
-    color = d3.scale.category20c();
+    color = d3.scale.category20();
 
 $(function() {
     // Setup D3
