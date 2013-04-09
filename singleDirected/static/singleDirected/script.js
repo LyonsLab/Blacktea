@@ -1,7 +1,7 @@
 var w = Math.max(800, $(window).width()),
     h = Math.max(800, $(window).height()),
     node, link, root;
-    color = d3.scale.category20c();
+    color = d3.scale.category20();
 
 $(function() {
     // Setup D3
@@ -21,7 +21,8 @@ $(function() {
         .attr("width", w)
         .attr("height", h);
 
-    d3.json("root/" + window.location.pathname.split('/').reverse()[0], function(json) {
+    url = window.location.pathname.split('/').reverse()[0];
+    d3.json("root/" + url, function(json) {
         root = json;
         update();
 
@@ -31,6 +32,30 @@ $(function() {
 function update() {
     var nodes = flatten(root),
         links = d3.layout.tree().links(nodes);
+
+    var legend = d3.select("#legend")
+        .append("svg:svg")
+        .attr("width", w)
+        .attr("height", h)
+
+    //legend
+    legend.selectAll("rect")
+        .data(nodes)
+        .enter()
+        .append("svg:rect")
+        .attr("x", 35)
+        .attr("y", function(d, i){ return (i *  20) + 50;})
+        .attr("width", 10)
+        .attr("height", 10)
+        .style("fill", fill);
+
+    legend.selectAll('text')
+        .data(nodes)
+        .enter()
+        .append("text")
+        .attr("x", 49)
+        .attr("y", function(d, i){ return (i *  20) + 59;})
+        .text(function(d){ return d.name;});
 
     // Restart the force layout.
     force
