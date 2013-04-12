@@ -86,14 +86,7 @@ function update() {
     // Enter any new nodes.
     var tooltip = d3.select("body")
         .append("div")
-        .style("position", "absolute")
-        .style("background", "#666")
-        .style("border-radius", "4")
-        .style("padding", "3")
-        .style("color", "#EEE")
-        .style("font-family", "tahoma")
-        .style("z-index", "10")
-        .style("visibility", "hidden");
+        .attr("id", "tooltip");
 
     node.enter()
         .append("svg:circle")

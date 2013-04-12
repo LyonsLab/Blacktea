@@ -11,9 +11,19 @@ line.link {
 }
 
 #legend {
-    width: 1px;
-    height: 1px;
+  width: 1px;
+  height: 1px;
 }
 
 #chart {
+}
+
+#tooltip {
+  position: absolute;
+  background: #666;
+  border-radius: 4;
+  padding: 3;
+  color: #EEE;
+  z-index: 10;
+  visibility: hidden;
 }
