@@ -94,9 +94,10 @@ function update() {
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
         .attr("r", function(d) {
-            if (d.type == "Job") size = 5;
-            else size = Math.sqrt(d.size) / 2 || 3;
-            if (size < 3) size = 4;
+            if (d.type == "Job") size = 4;
+            if (d.type == "User") size = 15;
+            else size = Math.sqrt(d.size) || 5;
+            if (size < 5) size = 8;
             return size;
         })
         .style("fill", fill)

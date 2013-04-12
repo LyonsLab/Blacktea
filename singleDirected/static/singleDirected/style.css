@@ -1,6 +1,10 @@
+body {
+  font-family: tahoma;
+  color: #666;
+}
 circle.node {
   cursor: pointer;
-  stroke: #3182bd;
+  stroke: #666;
   stroke-width: 1.5px;
 }
 
