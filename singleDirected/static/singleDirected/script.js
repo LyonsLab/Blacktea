@@ -8,13 +8,12 @@ $(function() {
     force = d3.layout.force()
         .on("tick", tick)
         .size([w, h])
-        .charge(-200)
-        .alpha(-.01)
+        .charge(-300)
         .theta(1)
-        .linkDistance(40)
-        .linkStrength(1)
-        .friction(.7)
-        .gravity(.2);
+        .linkDistance(70)
+        .linkStrength(2)
+        .friction(.2)
+        .gravity(.1);
 
     vis = d3.select("#chart")
         .append("svg:svg")
