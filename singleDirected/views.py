@@ -12,14 +12,14 @@ def index(request):
 def user(request, user_id):
     users = User.objects.get(user_id = user_id).__dict__
     size = Log.objects.filter(user=user_id).count()
-    details = Log.objects.filter(user=user_id).values('page', 'user').annotate(count=Count('link'))
+    details = Log.objects.filter(user=user_id).values('page', 'user').annotate(size=Count('link'))
 
     children = []
     for detail in details:
         children.append({ "name" : detail['page'],
                     "user_id" : detail['user'],
                     "type" : "Type",
-                    "size" : detail['count'],
+                    "size" : detail['size'],
                     "children" : []
                     })
 
@@ -33,12 +33,12 @@ def user(request, user_id):
     return HttpResponse(json.dumps(response), "text/json")
 
 def job(request, user_id, job):
-    details = Log.objects.filter(user=user_id, page=job).values('page', 'user', 'link', 'time', 'log_id')
+    details = Log.objects.filter(user=user_id, page=job).values()
 
     response = []
     for detail in details:
         response.append({ "name" : detail['page'],
-                    "user_id" : detail['user'],
+                    "user_id" : detail['user_id'],
                     "type" : "Job",
                     "link" : detail['link'],
                     "date" : str(detail['time']),

@@ -113,7 +113,7 @@ function update() {
         })
         .on("mousemove", function(){
             return tooltip
-                .style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+                .style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
         })
         .on("mouseout", function(){
             return tooltip
@@ -163,9 +163,14 @@ function fill(node) {
 function click(node) {
     if (node.type == "Job"){
         if(node.link != null) {
-            window.open(node.link);
+            url = "http://genomevolution.org"
+            if(new RegExp(url).test(node.link)){
+                window.open(node.link);
+            } else {
+                window.open(url + "/CoGe/" + node.link);
+            }
         }
-    } else {
+    } else if(node.type == "User" || node.size > 0){
         if (_.isEmpty(node.children) && (!node._children)) {
             if(node.type == 'User'){
                 url = "user/" + node.user_id
