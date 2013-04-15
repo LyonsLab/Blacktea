@@ -20,8 +20,9 @@ $(function() {
         .attr("width", w)
         .attr("height", h);
 
-    url = window.location.pathname.split('/').reverse()[0];
-    d3.json("root/" + url, function(json) {
+    url = window.location.pathname.replace(BASE_URL, "");
+    d3.json(BASE_URL + "root/" + url, function(json) {
+    console.log(url);
         root = json;
         update();
         data = flatten(root);
@@ -177,7 +178,7 @@ function click(node) {
             } else if (node.type == 'Type') {
                 url = "user/" + node.user_id + "/type/"+ node.name
             }
-            d3.json(url, function(json) {
+            d3.json(BASE_URL + url, function(json) {
                 node.children = json;
                 update();
             });
