@@ -15,11 +15,11 @@ line.link {
 }
 
 #legend {
-  width: 1px;
-  height: 1px;
 }
 
 #chart {
+  width: 1px;
+  height: 1px;
 }
 
 #tooltip {

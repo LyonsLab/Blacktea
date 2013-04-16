@@ -1,7 +1,8 @@
-var w = Math.max(800, $(window).width()),
-    h = Math.max(800, $(window).height()),
-    node, link, root;
-    color = d3.scale.category20();
+var w = Math.max(400, $(window).width()); // Width global
+var h = Math.max(800, $(window).height()); // Height global
+var node, link, root; // Force Directed Graph globals
+var color = d3.scale.category20(); // Color Scale
+var hidden = new Object();
 
 $(function() {
     // Setup D3
@@ -24,37 +25,56 @@ $(function() {
     d3.json(BASE_URL + "root/" + url, function(json) {
     console.log(url);
         root = json;
-        update();
         data = flatten(root);
-        var legend = d3.select("#legend")
-            .append("svg:svg")
-            .attr("width", w)
-            .attr("height", h)
-
-        //legend
-        legend.selectAll("rect")
-            .data(data)
-            .enter()
-            .append("svg:rect")
-            .attr("x", 35)
-            .attr("y", function(d, i){ return (i *  20) + 50;})
-            .attr("width", 10)
-            .attr("height", 10)
-            .style("fill", fill);
-
-        legend.selectAll('text')
-            .data(data)
-            .enter()
-            .append("text")
-            .attr("x", 49)
-            .attr("y", function(d, i){ return (i *  20) + 59;})
-            .text(function(d){ if(d.type != "User") return d.name;});
+        update();
+        drawLegend();
     });
 });
 
+function drawLegend() {
+    var legend = d3.select("#legend")
+        .append("svg:svg")
+        .attr("width", w/4)
+        .attr("height", h);
+
+    legend.selectAll("rect")
+        .data(data)
+        .enter()
+        .append("svg:rect")
+        .attr("x", 35)
+        .attr("y", function(d, i){ return (i *  20) + 50;})
+        .attr("width", 10)
+        .attr("height", 10)
+        .style("fill", fill)
+        .on("mousedown", hide);
+
+    legend.selectAll('text')
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("x", 49)
+        .attr("y", function(d, i){ return (i *  20) + 59;})
+        .text(function(d){ if(d.type != "User") return d.name;})
+        .on("mousedown", hide);
+};
+
+function hide(node) {
+    if (hidden[node.name]) {
+        console.log(node.name);
+        root.children.splice(node.id - 1, 0, hidden[node.name]);
+        delete hidden[node.name];
+    } else {
+        console.log(node.name);
+        console.log(root.children);
+        hidden[node.name] = root.children.splice(node.id - 1, 1)[0];
+    }
+    update();
+    console.log(root);
+}
+
 function update() {
     var nodes = flatten(root),
-        links = d3.layout.tree().links(nodes);
+    links = d3.layout.tree().links(nodes);
 
     // Restart the force layout.
     force
@@ -80,8 +100,7 @@ function update() {
 
     // Update the nodes…
     node = vis.selectAll("circle.node")
-        .data(nodes, function(d) { return d.id; })
-        .style("fill", fill);
+        .data(nodes, function(d) { return d.id; });
 
     // Enter any new nodes.
     var tooltip = d3.select("body")
@@ -141,12 +160,14 @@ function tick() {
 
 // Color nodes
 function fill(node) {
-    if (node.type == "Job")
-        if (node.link == null)
+    if (node.type == "Job") {
+        if (node.link == null) {
             return 'Red';
-        else
+        } else {
             return 'Green';
-    if (node.size > 0){
+        }
+    }
+    if (node.size > 0) {
         if (node.type == 'Type') {
             return color(node.name);
         } else if (node.type == 'User') {
@@ -160,7 +181,7 @@ function fill(node) {
 
 // Toggle children on click.
 function click(node) {
-    if (node.type == "Job"){
+    if (node.type == "Job") {
         if(node.link != null) {
             url = "http://genomevolution.org"
             if(new RegExp(url).test(node.link)){
@@ -169,7 +190,7 @@ function click(node) {
                 window.open(url + "/CoGe/" + node.link);
             }
         }
-    } else if(node.type == "User" || node.size > 0){
+    } else if(node.type == "User" || node.size > 0) {
         if (_.isEmpty(node.children) && (!node._children)) {
             if(node.type == 'User'){
                 url = "root/" + node.user_id
@@ -202,7 +223,7 @@ function flatten(root) {
     function recurse(node) {
         if (node.children) node.children.forEach(recurse);
         if (!node.id) node.id = ++i;
-        if (node.name == 'root') node.fixed = true; 
+        if (node.type == 'User') node.fixed = true;
         nodes.push(node);
     }
 
