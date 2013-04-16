@@ -56,7 +56,6 @@ function update() {
     var nodes = flatten(root),
         links = d3.layout.tree().links(nodes);
 
-
     // Restart the force layout.
     force
         .nodes(nodes)
@@ -128,7 +127,6 @@ function update() {
 
     // Exit any old nodes.
     node.exit().remove();
-
 }
 
 function tick() {
@@ -174,7 +172,7 @@ function click(node) {
     } else if(node.type == "User" || node.size > 0){
         if (_.isEmpty(node.children) && (!node._children)) {
             if(node.type == 'User'){
-                url = "user/" + node.user_id
+                url = "root/" + node.user_id
             } else if (node.type == 'Type') {
                 url = "user/" + node.user_id + "/type/"+ node.name
             }

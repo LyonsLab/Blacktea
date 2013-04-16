@@ -54,7 +54,6 @@ def list(request, user_id, list):
     size = Log.objects.filter(user=user_id).count()
     details = Log.objects.filter(user=user_id, page__in=list).values('page', 'user').annotate(size=Count('link'))
 
-
     children = []
     for detail in details:
         children.append({ "name" : detail['page'],
