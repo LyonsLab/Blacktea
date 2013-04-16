@@ -33,7 +33,7 @@ $(function() {
         var legend = d3.select("#legend")
             .append("svg:svg")
             .attr("width", w/4)
-            .attr("height", h);
+            .attr("height", h * .6);
 
         legend.selectAll("rect")
             .data(data)
@@ -139,7 +139,7 @@ $(function() {
             .attr("y2", function(d) { return d.target.y; });
 
         node.attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; });
+            .attr("cy", function(d) { return d.y; })
     }
 
     // Toggle nodes on legend click
