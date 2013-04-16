@@ -56,16 +56,6 @@ $(function() {
             .on("mousedown", hide);
     };
 
-    function hide(node) {
-        if (hidden[node.name]) {
-            root.children.splice(node.id - 1, 0, hidden[node.name]);
-            delete hidden[node.name];
-        } else {
-            hidden[node.name] = root.children.splice(node.id - 1, 1)[0];
-        }
-        update();
-    }
-
     function update() {
         var nodes = flatten(root),
         links = d3.layout.tree().links(nodes);
@@ -150,6 +140,17 @@ $(function() {
 
         node.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
+    }
+
+    // Toggle nodes on legend click
+    function hide(node) {
+        if (hidden[node.name]) {
+            root.children.splice(node.id - 1, 0, hidden[node.name]);
+            delete hidden[node.name];
+        } else {
+            hidden[node.name] = root.children.splice(node.id - 1, 1)[0];
+        }
+        update();
     }
 
     // Color nodes
