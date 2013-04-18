@@ -20,7 +20,7 @@ $(function() {
         .attr("width", w)
         .attr("height", h);
 
-    d3.json("users", function(json) {
+    d3.json("root", function(json) {
         root = json;
         update();
     });
