@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 import json
 
-from forceDirected.models import User, Log
+from .models import User, Log
 
 # Create your views here.
 def index(request):
@@ -24,11 +24,11 @@ def user_details(request, user_id):
     response = []
     for detail in details:
         response.append({ "name" : detail['page'],
-                    "user_id" : detail['user'],
-                    "type" : "Type",
-                    "size" : detail['count'],
-                    "children" : []
-                    })
+                          "user_id" : detail['user'],
+                          "type" : "Type",
+                          "size" : detail['count'],
+                          "children" : []
+                        })
 
 
     return HttpResponse(json.dumps(response), "text/json")
@@ -39,12 +39,12 @@ def job(request, user_id, job):
     response = []
     for detail in details:
         response.append({ "name" : detail['page'],
-                    "user_id" : detail['user'],
-                    "type" : "Job",
-                    "link" : detail['link'],
-                    "date" : str(detail['time']),
-                    "log_id" : detail['log_id'],
-                    })
+                          "user_id" : detail['user'],
+                          "type" : "Job",
+                          "link" : detail['link'],
+                          "date" : str(detail['time']),
+                          "log_id" : detail['log_id'],
+                        })
 
 
     return HttpResponse(json.dumps(response), "text/json")
