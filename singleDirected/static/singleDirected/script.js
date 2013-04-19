@@ -147,11 +147,14 @@ function tick() {
 
 // Toggle nodes on legend click
 function hide(node) {
+    index = _.indexOf(root.children,
+                        _.find(root.children,
+                            function(x){return x.name == node.name }))
     if (hidden[node.name]) {
-        root.children.splice(node.index, 0, hidden[node.name][0]);
+        root.children.splice(index, 0, hidden[node.name][0]);
         delete hidden[node.name];
     } else {
-        hidden[node.name] = root.children.splice(node.index, 1);
+        hidden[node.name] = root.children.splice(index, 1);
     }
     update();
 }
