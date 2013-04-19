@@ -1,6 +1,6 @@
-    var w = Math.max(800, $(window).width()); // Width global
-    var h = Math.max(450, $(window).height()); // Height global
-    var node, link, root; // Force Directed Graph globals
+    var w = Math.max(900); // Width global
+    var h = Math.max(600); // Height global
+    var legend, node, link, root; // Force Directed Graph globals
     var color = d3.scale.category20(); // Color Scale
     var hidden = new Object(); // Object that holds hidden nodes
 
@@ -9,16 +9,19 @@ $(function() {
     force = d3.layout.force()
         .on("tick", tick)
         .size([w, h])
-        .charge(-300)
+        .charge(-400)
         .theta(1)
-        .linkDistance(70)
+        .linkDistance(60)
         .linkStrength(2)
-        .friction(.2)
+        .friction(.3)
         .gravity(.1);
 
-    vis = d3.select("#chart")
+    padding = 180;
+    svg = d3.select("#chart")
         .append("svg:svg")
-        .attr("width", w)
+        .style("margin-left", padding)
+        .style("border", "solid 1px #999")
+        .attr("width", w - padding)
         .attr("height", h);
 
     url = window.location.pathname.replace(BASE_URL, "");
@@ -31,30 +34,30 @@ $(function() {
 });
 
 function drawLegend() {
-    var legend = d3.select("#legend")
+    legend = d3.select("#legend")
         .append("svg:svg")
-        .attr("width", w * .4)
-        .attr("height", h * .5);
+        .attr("width", padding)
+        .attr("height", h);
 
     legend.selectAll("rect")
         .data(data)
         .enter()
         .append("svg:rect")
-        .attr("x", 35)
-        .attr("y", function(d, i){ return (i *  20) + 50;})
+        .attr("x", 15)
+        .attr("y", function(d, i){ return (i *  21) + 25;})
         .attr("width", 10)
         .attr("height", 10)
         .style("fill", fill)
-        .on("mousedown", hide);
+        .on("click", hide);
 
-    legend.selectAll('text')
+    legend.selectAll("text")
         .data(data)
         .enter()
         .append("text")
-        .attr("x", 49)
-        .attr("y", function(d, i){ return (i *  20) + 59;})
+        .attr("x", 29)
+        .attr("y", function(d, i){ return (i * 21) + 34;})
         .text(function(d){ if(d.type != "User") return d.name;})
-        .on("mousedown", hide);
+        .on("click", hide);
 };
 
 function update() {
@@ -62,13 +65,12 @@ function update() {
     links = d3.layout.tree().links(nodes);
 
     // Restart the force layout.
-    force
-        .nodes(nodes)
-        .links(links)
-        .start();
+    force.nodes(nodes)
+         .links(links)
+         .start();
 
     // Update the links…
-    link = vis.selectAll("line.link")
+    link = svg.selectAll("line.link")
         .data(links, function(d) { return d.target.id; });
 
     // Enter any new links.
@@ -84,7 +86,7 @@ function update() {
     link.exit().remove();
 
     // Update the nodes…
-    node = vis.selectAll("circle.node")
+    node = svg.selectAll("circle.node")
         .data(nodes, function(d) { return d.id; });
 
     // Enter any new nodes.
@@ -146,10 +148,10 @@ function tick() {
 // Toggle nodes on legend click
 function hide(node) {
     if (hidden[node.name]) {
-        root.children.splice(node.id - 1, 0, hidden[node.name]);
+        root.children.splice(node.index, 0, hidden[node.name][0]);
         delete hidden[node.name];
     } else {
-        hidden[node.name] = root.children.splice(node.id - 1, 1)[0];
+        hidden[node.name] = root.children.splice(node.index, 1);
     }
     update();
 }
@@ -219,7 +221,6 @@ function flatten(root) {
     function recurse(node) {
         if (node.children) node.children.forEach(recurse);
         if (!node.id) node.id = ++i;
-        if (node.type == 'User') node.fixed = true;
         nodes.push(node);
     }
 
