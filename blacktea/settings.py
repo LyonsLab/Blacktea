@@ -9,15 +9,22 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+f = open('/opt/apache2/CoGe/coge.conf')
+config = {}
+
+for line in f:
+    if line.split('\t')[0].startswith('DB'):
+        line = line.split('\t')
+        config[line[0]] = line[-1].strip()
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'coge',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': 'coge',
-        'PASSWORD': '123coge321',
-        'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '3307',                      # Set to empty string for default.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config['DBNAME'],
+        'USER': config['DBUSER'],
+        'PASSWORD': config['DBPASS'],
+        'HOST': config['DBHOST'],
+        'PORT': config['DBPORT'],
     }
 }
 
