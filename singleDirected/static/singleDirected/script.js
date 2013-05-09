@@ -53,6 +53,7 @@ function drawLegend() {
         .attr("y", function(d, i){ return (i *  21) + 25;})
         .attr("width", 10)
         .attr("height", 10)
+        .style("cursor", "pointer")
         .style("fill", fill)
         .on("click", hide)
         .on("mouseover", _.throttle(pulsate, 500));
@@ -63,6 +64,7 @@ function drawLegend() {
         .append("text")
         .attr("x", 29)
         .attr("y", function(d, i){ return (i * 21) + 34;})
+        .style("cursor", "pointer")
         .text(function(d){ if(d.type != "User") return d.name;})
         .on("click", hide)
         .on("mouseover", _.throttle(pulsate, 500));
@@ -116,10 +118,10 @@ function update() {
         .on("mouseover", function(d) {
             if (d.type != 'Job') {
                 return tooltip.style("visibility", "visible")
-                        .text(d.name + " : " + d.size);
+                        .html(d.name + " : " + d.size);
             } else {
                 return tooltip.style("visibility", "visible")
-                        .text("date: "  + d.date + "\n\nLink: " + d.link + "\n\nlog id: " + d.log_id);
+                        .html("date: "  + d.date + "<br>Link: " + d.link + "<br>log id: " + d.log_id);
             }
         })
         .on("mousemove", function(){
