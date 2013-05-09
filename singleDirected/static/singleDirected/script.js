@@ -1,8 +1,9 @@
-    var w = Math.max(900); // Width global
+    ;var w = Math.max(900); // Width global
     var h = Math.max(600); // Height global
     var legend, node, link, root; // Force Directed Graph globals
     var color = d3.scale.category20(); // Color Scale
     var hidden = new Object(); // Object that holds hidden nodes
+
 
 $(function() {
     // Setup D3
@@ -24,10 +25,15 @@ $(function() {
         .attr("width", w - padding)
         .attr("height", h);
 
+    tooltip = d3.select("body")
+        .append("div")
+        .attr("id", "tooltip");
+
     url = window.location.pathname.replace(BASE_URL, "");
     d3.json(BASE_URL + "root/" + url, function(json) {
         root = json;
         data = flatten(root);
+
         update();
         drawLegend();
     });
@@ -48,7 +54,8 @@ function drawLegend() {
         .attr("width", 10)
         .attr("height", 10)
         .style("fill", fill)
-        .on("click", hide);
+        .on("click", hide)
+        .on("mouseover", _.throttle(pulsate, 500));
 
     legend.selectAll("text")
         .data(data)
@@ -57,7 +64,8 @@ function drawLegend() {
         .attr("x", 29)
         .attr("y", function(d, i){ return (i * 21) + 34;})
         .text(function(d){ if(d.type != "User") return d.name;})
-        .on("click", hide);
+        .on("click", hide)
+        .on("mouseover", _.throttle(pulsate, 500));
 };
 
 function update() {
@@ -90,13 +98,10 @@ function update() {
         .data(nodes, function(d) { return d.id; });
 
     // Enter any new nodes.
-    var tooltip = d3.select("body")
-        .append("div")
-        .attr("id", "tooltip");
-
     node.enter()
         .append("svg:circle")
         .attr("class", "node")
+        .attr("name", function(d) {if (d.type == 'Type') return d.name; })
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
         .attr("r", function(d) {
@@ -145,18 +150,33 @@ function tick() {
         .attr("cy", function(d) { return d.y; })
 }
 
-// Toggle nodes on legend click
-function hide(node) {
-    index = _.indexOf(root.children,
-                        _.find(root.children,
-                            function(x){return x.name == node.name }))
+function hide(node, i) {
+    index = _.indexOf(root.children, _.find(root.children,
+                function(x){ return x.name == node.name }))
     if (hidden[node.name]) {
         root.children.splice(index, 0, hidden[node.name][0]);
         delete hidden[node.name];
+        d3.select(d3.selectAll("rect")[0][i]).style("fill", fill)
+        d3.select(d3.selectAll("text")[0][i]).attr("fill", "#000")
     } else {
         hidden[node.name] = root.children.splice(index, 1);
+        d3.select(d3.selectAll("rect")[0][i]).style("fill", "#BBB")
+        d3.select(d3.selectAll("text")[0][i]).attr("fill", "#BBB")
     }
     update();
+}
+
+// Nodes pulsate on legend hover.
+function pulsate(node) {
+    var pulseNode = d3.select("[name='"+node.name+"']")
+    if (_.isObject(pulseNode[0][0])){
+        _.throttle(originalRadius = pulseNode[0][0].getAttribute("r"), 200)
+        for (i = 0; i < 300; i++){
+            val = Math.abs(Math.sqrt(i * originalRadius));
+            pulseNode.transition().attr("r", val);
+        }
+        pulseNode.transition().delay(200).attr("r", originalRadius);
+    }
 }
 
 // Color nodes
@@ -172,11 +192,11 @@ function fill(node) {
         if (node.type == 'Type') {
             return color(node.name);
         } else if (node.type == 'User') {
-            return 'white';
+            return 'White';
         }
-        return 'white';
+        return 'White';
     } else {
-        return 'grey';
+        return 'Grey';
     }
 }
 
