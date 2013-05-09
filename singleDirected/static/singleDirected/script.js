@@ -29,8 +29,9 @@ $(function() {
         .append("div")
         .attr("id", "tooltip");
 
-    url = window.location.pathname.replace(BASE_URL, "");
-    d3.json(BASE_URL + "root/" + url, function(json) {
+    url = window.location.pathname.replace("blacktea/standalone/", "");
+    console.log(url);
+    d3.json(BASE_URL + "root" + url, function(json) {
         root = json;
         data = flatten(root);
 
