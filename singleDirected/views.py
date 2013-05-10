@@ -7,8 +7,7 @@ from .models import User, Log
 
 # Create your views here.
 def index(request):
-    return render(request, 'singleDirected/index.html',
-            {"BASE_URL" : "/rchasman/standalone/"}, content_type="text/html")
+    return render(request, 'singleDirected/index.html', content_type="text/html")
 
 def user(request, user_id):
     users = User.objects.get(user_id = user_id).__dict__
