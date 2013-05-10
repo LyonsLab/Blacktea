@@ -22,6 +22,11 @@ line.link {
   height: 1px;
 }
 
+#graphic {
+  margin-left: 200px;
+  border: solid 1px #999;
+}
+
 #tooltip {
   position: absolute;
   background: #666;

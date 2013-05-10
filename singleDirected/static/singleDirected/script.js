@@ -1,9 +1,8 @@
-    ;var w = Math.max(900); // Width global
-    var h = Math.max(600); // Height global
-    var legend, node, link, root; // Force Directed Graph globals
-    var color = d3.scale.category20(); // Color Scale
-    var hidden = new Object(); // Object that holds hidden nodes
-
+var w = Math.max(document.width - 300, 700); // Width global
+var h = Math.max(document.height - 500, 500); // Height global
+var legend, node, link, root; // Force Directed Graph globals
+var color = d3.scale.category20(); // Color Scale
+var hidden = new Object(); // Object that holds hidden nodes
 
 $(function() {
     // Setup D3
@@ -20,10 +19,9 @@ $(function() {
     padding = 180;
     svg = d3.select("#chart")
         .append("svg:svg")
-        .style("margin-left", padding)
-        .style("border", "solid 1px #999")
         .attr("width", w - padding)
-        .attr("height", h);
+        .attr("height", h)
+        .attr("id", "graphic")
 
     tooltip = d3.select("body")
         .append("div")

@@ -4,7 +4,6 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('rchasman', 'rchasman@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -68,11 +67,11 @@ MEDIA_URL = '/rchasman/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = '/home/rchasman/public/blacktea/static/'
+STATIC_ROOT = '/opt/apache2/Blacktea/static/'
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = '/rchasman/static/'
+STATIC_URL = '/blacktea/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
