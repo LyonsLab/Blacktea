@@ -1,5 +1,6 @@
-var w = Math.max(document.width - 300, 700); // Width global
-var h = Math.max(document.height - 500, 500); // Height global
+var w = Math.max($(document).width() - ($(document).width() / 8), 600); // Width global
+var h = 600; // Height global
+console.log(w + " " + h);
 var legend, node, link, root; // Force Directed Graph globals
 var color = d3.scale.category20(); // Color Scale
 var hidden = new Object(); // Object that holds hidden nodes
@@ -16,10 +17,9 @@ $(function() {
         .friction(.3)
         .gravity(.1);
 
-    padding = 180;
     svg = d3.select("#chart")
         .append("svg:svg")
-        .attr("width", w - padding)
+        .attr("width", w)
         .attr("height", h)
         .attr("id", "graphic")
 
@@ -28,7 +28,7 @@ $(function() {
         .attr("id", "tooltip");
 
     url = window.location.pathname.replace("blacktea/standalone/", "");
-    console.log(url);
+    BASE_URL = "/blacktea/standalone/"
     d3.json(BASE_URL + "root" + url, function(json) {
         root = json;
         data = flatten(root);
@@ -41,7 +41,7 @@ $(function() {
 function drawLegend() {
     legend = d3.select("#legend")
         .append("svg:svg")
-        .attr("width", padding)
+        .attr("width", "150")
         .attr("height", h);
 
     legend.selectAll("rect")

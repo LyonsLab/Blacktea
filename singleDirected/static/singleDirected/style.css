@@ -30,7 +30,7 @@ line.link {
 #tooltip {
   position: absolute;
   background: #666;
-  border-radius: 4;
+  border-radius: 4px;
   padding: 3;
   color: #EEE;
   z-index: 10;
