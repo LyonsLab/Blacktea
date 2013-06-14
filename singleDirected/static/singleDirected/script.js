@@ -171,12 +171,13 @@ function hide(node, i) {
 function pulsate(node) {
     var pulseNode = d3.select("[name='"+node.name+"']")
     if (_.isObject(pulseNode[0][0])){
-        _.throttle(originalRadius = pulseNode[0][0].getAttribute("r"), 200)
-        for (i = 0; i < 300; i++){
+        _.throttle(originalRadius = pulseNode[0][0].getAttribute("r"), 150)
+        for (i = 0; i < 200; i++){
             val = Math.abs(Math.sqrt(i * originalRadius));
-            pulseNode.transition().attr("r", val);
+            pulseNode.transition().attr("r", val / 1.5);
         }
         pulseNode.transition().delay(200).attr("r", originalRadius);
+        force.resume();
     }
 }
 
