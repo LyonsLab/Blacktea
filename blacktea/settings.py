@@ -9,7 +9,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-f = open('/opt/apache2/coge/web/coge.conf')
+f = open('/opt/apache2/coge/coge.conf')
 config = {}
 
 for line in f:
